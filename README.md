@@ -129,7 +129,7 @@ POST   /api/v1/interactions/check
 POST   /api/v1/feeding
 ```
 
-Каждый endpoint должен иметь определённый request, response и формат ошибок. Бизнес-логика находится в Controllers, её вызов и координация — в Service.
+Каждый endpoint должен иметь определённый request, response и формат ошибок. Controllers обрабатывают HTTP-запросы, вызывают соответствующие Service и формируют HTTP-ответы.
 
 ## 7. Интерфейс
 
