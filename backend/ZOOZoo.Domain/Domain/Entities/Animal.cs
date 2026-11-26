@@ -47,19 +47,19 @@
             FeedingTo = feedingTo;
         }
 
-        public int Id { get; set; }
-        public required string Name { get; set; }
-        public int SpeciesId { get; set; }
-        public int ZoneId { get; set; }
-        public HealthStatus HealthStatus { get; set; }
-        public bool InteractionAllowed { get; set; }
-        public FoodType DietType { get; set; }
-        public TimeOnly FeedingFrom { get; set; }
-        public TimeOnly FeedingTo { get; set; }
-        public DateTime? LastFedAt { get; set; }
+        public int Id { get; private set; }
+        public string Name { get; private set; }
+        public int SpeciesId { get; private set; }
+        public int ZoneId { get; private set; }
+        public HealthStatus HealthStatus { get; private set; }
+        public bool InteractionAllowed { get; private set; }
+        public FoodType DietType { get; private set; }
+        public TimeOnly FeedingFrom { get; private set; }
+        public TimeOnly FeedingTo { get; private set; }
+        public DateTime? LastFedAt { get; private set; }
 
-        public Species Species { get; set; } = null!;
-        public Zone Zone { get; set; } = null!;
+        public Species Species { get; private set; } = null!;
+        public Zone Zone { get; private set; } = null!;
 
         public void MoveToZone(int zoneId)
         {
