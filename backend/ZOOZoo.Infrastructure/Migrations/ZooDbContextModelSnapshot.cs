@@ -30,14 +30,14 @@ namespace ZOOZoo.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("DietType")
+                        .HasColumnType("integer");
+
                     b.Property<TimeOnly>("FeedingFrom")
                         .HasColumnType("time without time zone");
 
                     b.Property<TimeOnly>("FeedingTo")
                         .HasColumnType("time without time zone");
-
-                    b.Property<int>("FoodType")
-                        .HasColumnType("integer");
 
                     b.Property<int>("HealthStatus")
                         .HasColumnType("integer");

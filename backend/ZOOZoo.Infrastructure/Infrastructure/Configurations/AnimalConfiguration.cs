@@ -18,7 +18,7 @@ namespace ZOOZoo.Infrastructure.Configurations
             builder.Property(a => a.HealthStatus)
                 .IsRequired();
 
-            builder.Property(a => a.FoodType)
+            builder.Property(a => a.DietType)
                 .IsRequired();
 
             builder.HasIndex(a => a.SpeciesId);
