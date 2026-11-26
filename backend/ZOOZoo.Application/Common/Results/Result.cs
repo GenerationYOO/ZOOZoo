@@ -35,6 +35,7 @@ namespace ZOOZoo.Application.Common.Results
         }
     }
 }
+
 public readonly record struct Unit
 {
     public static Unit Value => default;
