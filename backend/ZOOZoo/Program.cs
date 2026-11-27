@@ -1,13 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using ZOOZoo.Infrastructure;
+using ZOOZoo.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<ZooDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Строка подключения 'DefaultConnection' не настроена.");
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(connectionString);
 
 var app = builder.Build();
 
