@@ -19,4 +19,9 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ZOOZoo.Application\ZOOZoo.Application.csproj" />
+    <ProjectReference Include="..\ZOOZoo.Infrastructure\ZOOZoo.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
