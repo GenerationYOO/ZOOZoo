@@ -1,7 +1,16 @@
-﻿namespace ZOOZoo.Domain.Entities
+﻿using ZOOZoo.Domain.Enums;
+using ZOOZoo.Domain.ValueObjects;
+
+namespace ZOOZoo.Domain.Entities
 {
     public class Animal
     {
+        private Animal()
+        {
+            Name = null!;
+            FeedingWindow = null!;
+        }
+
         public Animal(
             int id,
             string name,
@@ -10,31 +19,27 @@
             HealthStatus healthStatus,
             bool interactionAllowed,
             FoodType dietType,
-            TimeOnly feedingFrom,
-            TimeOnly feedingTo
+            FeedingWindow feedingWindow
             )
         {
-            if(id < 0)
+            if (id < 0)
                 throw new ArgumentOutOfRangeException(nameof(id), id, "ID не может быть отрицательным");
 
             ArgumentException.ThrowIfNullOrWhiteSpace(name);
 
-            if(speciesId < 0)
+            if (speciesId <= 0)
                 throw new ArgumentOutOfRangeException(nameof(speciesId), speciesId, "ID вида не может быть отрицательным");
 
-            if (zoneId < 0)
+            if (zoneId <= 0)
                 throw new ArgumentOutOfRangeException(nameof(zoneId), zoneId, "ID зоны не может быть отрицательным");
 
-            if(!Enum.IsDefined(healthStatus))
-                throw new ArgumentException("Неизвестный статус здоровья", nameof(healthStatus));
+            if (!Enum.IsDefined(healthStatus))
+                throw new ArgumentOutOfRangeException("Неизвестный статус здоровья", nameof(healthStatus));
 
             if (!Enum.IsDefined(dietType))
-                throw new ArgumentException("Неизвестный тип питания", nameof(dietType));
+                throw new ArgumentOutOfRangeException("Неизвестный тип питания", nameof(dietType));
 
-            if (feedingFrom == feedingTo)
-                throw new ArgumentException(
-                    "Время начала и окончания кормления не должны совпадать.",
-                    nameof(feedingTo));
+            ArgumentNullException.ThrowIfNull(feedingWindow);
 
             Id = id;
             Name = name;
@@ -43,8 +48,7 @@
             HealthStatus = healthStatus;
             InteractionAllowed = interactionAllowed;
             DietType = dietType;
-            FeedingFrom = feedingFrom;
-            FeedingTo = feedingTo;
+            FeedingWindow = feedingWindow;
         }
 
         public int Id { get; private set; }
@@ -54,25 +58,27 @@
         public HealthStatus HealthStatus { get; private set; }
         public bool InteractionAllowed { get; private set; }
         public FoodType DietType { get; private set; }
-        public TimeOnly FeedingFrom { get; private set; }
-        public TimeOnly FeedingTo { get; private set; }
+        public FeedingWindow FeedingWindow { get; private set; } = null!;
         public DateTime? LastFedAt { get; private set; }
 
         public Species Species { get; private set; } = null!;
         public Zone Zone { get; private set; } = null!;
 
-        public void MoveToZone(int zoneId)
+        public void MoveToZone(Zone zone)
         {
-            if (zoneId < 0)
-                throw new ArgumentOutOfRangeException(nameof(zoneId), zoneId, "ID зоны не может быть отрицательным");
+            ArgumentNullException.ThrowIfNull(zone);
 
-            if(zoneId == ZoneId)
-                throw new ArgumentException("Животное уже находится в этой зоне", nameof(zoneId));
+            if (zone.Id <= 0)
+                throw new ArgumentOutOfRangeException(nameof(zone));
 
-            ZoneId = zoneId;
+            if (zone.Id == ZoneId)
+                throw new InvalidOperationException("Животное уже находится в этой зоне.");
+
+            ZoneId = zone.Id;
+            Zone = zone;
         }
 
-        public bool CanInteract() => 
+        public bool CanInteract =>
             InteractionAllowed && HealthStatus == HealthStatus.Healthy;
 
         public void Feed(FoodType food, DateTime currentTime)
@@ -80,43 +86,20 @@
             if (!Enum.IsDefined(food))
                 throw new ArgumentOutOfRangeException(nameof(food), food, "Неизвестный тип еды");
 
-            if(food != DietType)
-                throw new ArgumentException("Неподходящий тип еды для данного животного", nameof(food));
+            if (food != DietType)
+                throw new InvalidOperationException("Неподходящий тип еды для данного животного");
 
             var time = TimeOnly.FromDateTime(currentTime);
 
-            if(!IsFeedingTime(time))
+            if (!FeedingWindow.Contains(time))
                 throw new InvalidOperationException("Сейчас не время кормления");
 
-            if (LastFedAt.HasValue && IsWithinFeedingWindow(LastFedAt.Value) == 
-                IsWithinFeedingWindow(currentTime))
+            if (LastFedAt is { } lastFedAt &&
+                FeedingWindow.GetPeriodStart(lastFedAt) ==
+                FeedingWindow.GetPeriodStart(currentTime))
                 throw new InvalidOperationException("Животное уже было покормлено сегодня");
 
             LastFedAt = currentTime;
         }
-
-        private bool IsFeedingTime(TimeOnly time) =>
-            FeedingFrom <= FeedingTo
-                ? time >= FeedingFrom && time <= FeedingTo
-                : time >= FeedingFrom || time <= FeedingTo;
-
-        private DateTime IsWithinFeedingWindow(DateTime time) =>
-            FeedingFrom > FeedingTo &&
-                TimeOnly.FromDateTime(time) <= FeedingTo
-                ? time.Date.AddDays(-1)
-                : time.Date;
-    }
-
-    public enum HealthStatus
-    {
-        Healthy,
-        Sick
-    }
-
-    public enum FoodType
-    {
-        Herbivore,
-        Carnivore,
-        Omnivore
     }
 }
