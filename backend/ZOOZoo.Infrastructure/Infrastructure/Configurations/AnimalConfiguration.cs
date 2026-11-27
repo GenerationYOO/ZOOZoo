@@ -18,7 +18,7 @@ namespace ZOOZoo.Infrastructure.Configurations
             builder.Property(a => a.HealthStatus)
                 .IsRequired();
 
-            builder.Property(a => a.FoodType)
+            builder.Property(a => a.DietType)
                 .IsRequired();
 
             builder.HasIndex(a => a.SpeciesId);
@@ -33,6 +33,17 @@ namespace ZOOZoo.Infrastructure.Configurations
                 .WithMany(z => z.Animals)
                 .HasForeignKey(a => a.ZoneId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.ComplexProperty(a => a.FeedingWindow, window =>
+            {
+                window.Property(w => w.Start)
+                    .HasColumnName("FeedingFrom")
+                    .IsRequired();
+
+                window.Property(w => w.End)
+                    .HasColumnName("FeedingTo")
+                    .IsRequired();
+            });
         }
     }
 }
