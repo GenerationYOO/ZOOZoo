@@ -40,10 +40,10 @@ namespace ZOOZoo.Application.Common.Results
     }
     public enum ErrorType
     {
-        NotFound,
-        ValidationError,
-        BusinessRuleViolation,
-        Conflict,
-        ConfigurationError
+        NotFound = 0,
+        ValidationError = 1,
+        BusinessRuleViolation = 2,
+        Conflict = 3,
+        ConfigurationError = 4
     }
 }
